@@ -1,18 +1,16 @@
 extends Sprite
 
-# TEMPORALY!!!!!
-var obtainedEffects = [0, 1, 3, 4]
-var curr_eff = 3
+onready var plr = get_node("/root/PlayerStats")
 
 func _ready():
 	# Currect equipped effect
-	if frame == curr_eff:
+	if frame == plr.state:
 		modulate.a = 1
 	# Inactive effects
 	else:
 		modulate.a = 0.5
 	
-	if !obtainedEffects.has(frame):
+	if !plr.obtainedEffects.has(frame):
 		frame = 0
 
 func get_dimensions():

@@ -21,4 +21,4 @@ func _ready():
 	var marginy = dimension
 	
 	# Show all frames, reduce space between objects
-	scr.show_frames(Img, N_FRAMES, 0, marginy, 0.5)
+	scr.show_frames(Img, N_FRAMES, -3, marginy-8, 0.5)

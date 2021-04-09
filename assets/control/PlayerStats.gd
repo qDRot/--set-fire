@@ -1,5 +1,15 @@
 extends Node
 
-func _ready():
-	var curr_eff = 3
-	var obtainedEffects = [0, 1, 3, 4]
+# Effects
+enum {
+	NORMAL,
+	CLEAN,
+	KNIFE,
+	GOMI,
+	KOMA_A,
+	SICK,
+	KOMA_UM = 30
+}
+
+var obtainedEffects = [NORMAL, KNIFE, SICK, GOMI]
+var state = KNIFE

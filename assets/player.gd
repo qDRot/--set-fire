@@ -1,6 +1,7 @@
 extends Area2D
 
 export (PackedScene) var Blood
+onready var plr = get_node("/root/PlayerStats")
 
 const DEFAULT_SPEED = 90
 
@@ -15,22 +16,17 @@ enum {
 	KOMA_UM = 30
 }
 
-# TEMPORALLY!!!!!
-var obtainedEffects = [NORMAL, SICK, CLEAN, GOMI, KNIFE]
-
-# Player state
+# Player plr.state
 enum {
 	NONE,
 	ACT,
 	WALK
 }
 
-
-# Default states
-export var state = KNIFE
+# Default plr.states
+var action = NONE
+var stun = false
 export var speed:int = DEFAULT_SPEED
-export var action = NONE
-export var stun = false
 
 # Screen size
 var screen_size
@@ -52,6 +48,7 @@ var anim_act:String
 # When loading a node prepare animation tree
 # and get screen size
 func _ready():
+	plr.state = KNIFE
 	$AnimatedSprite.set_process_input(true)
 	animation_tree()
 	screen_size = Vector2(ProjectSettings.get_setting("display/window/size/width"), ProjectSettings.get_setting("display/window/size/height"))
@@ -134,7 +131,7 @@ func stun_4anim(anim):
 	else:
 		stun = false
 
-# Toggle stun state
+# Toggle stun plr.state
 func stunToggle():
 	stun = false if stun else true
 
@@ -163,12 +160,11 @@ func effects():
 	var numKey = [KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9]
 	
 	if action != ACT:
-		print(obtainedEffects.size())
-		for i in obtainedEffects.size():
+		for i in plr.obtainedEffects.size():
 			if Input.is_key_pressed(numKey[i]):
-				reloadEffect(obtainedEffects[i])
+				reloadEffect(plr.obtainedEffects[i])
 	
-	match state:
+	match plr.state:
 	# Trash effect
 		GOMI:	
 			# Stun on action
@@ -197,10 +193,10 @@ func effects():
 		
 	# Komainu effect
 		KOMA_UM, KOMA_A:
-			# Change UM and A state when pressed
+			# Change UM and A plr.state when pressed
 			# and vise versa
 			if Input.is_action_just_pressed("key_action"):
-				state = KOMA_UM if state == KOMA_A else KOMA_A
+				plr.state = KOMA_UM if plr.state == KOMA_A else KOMA_A
 				animation_tree()
 	# Sick effect
 		SICK:
@@ -211,21 +207,21 @@ func effects():
 				$Run_Timer.start()
 	
 	# Broom effect
-	if state == CLEAN:
+	if plr.state == CLEAN:
 		# Enable broom collision
 		broomColis.disabled = false
 	else:
 		broomColis.disabled = true
 	
 	# Stun until action animation is finished
-	if $AnimatedSprite.animation == anim_act && state != GOMI:
+	if $AnimatedSprite.animation == anim_act && plr.state != GOMI:
 		stun_4anim(anim_act)
 
 
 # Reload effect
 func reloadEffect(effect:int):
 	speed = DEFAULT_SPEED
-	state = effect
+	plr.state = effect
 	animation_tree()
 
 
@@ -238,7 +234,7 @@ func _on_Timer_timeout():
 	stun = false
 # -> Run timer
 func _on_Run_Timer_timeout():
-	if state == SICK:
+	if plr.state == SICK:
 		stun = true
 		timer.set_wait_time(2)
 		timer.start()
@@ -251,47 +247,47 @@ func _on_Run_Timer_timeout():
 # Animation tree set
 func animation_tree():
 	# Normal
-	if state == NORMAL:
+	if plr.state == NORMAL:
 		anim_L = "norm_L"
 		anim_R = "norm_R"
 		anim_U = "norm_U"
 		anim_D = "norm_D"
 		anim_act = "default"
 	# Broom
-	elif state == CLEAN:
+	elif plr.state == CLEAN:
 		anim_L = "clean_L"
 		anim_R = "clean_R"
 		anim_U = "clean_U"
 		anim_D = "clean_D"
 		anim_act = "clean_happy"
 	# Knife
-	elif state == KNIFE:
+	elif plr.state == KNIFE:
 		anim_L = "knife_L"
 		anim_R = "knife_R"
 		anim_U = "knife_U"
 		anim_D = "knife_D"
 		anim_act = "knife_cut"
 	# Trash
-	elif state == GOMI:
+	elif plr.state == GOMI:
 		anim_L = "gomi_L"
 		anim_R = "gomi_R"
 		anim_U = "gomi_U"
 		anim_D = "gomi_D"
 		anim_act = "gomi_hide"
 	# Komainu
-	elif state == KOMA_A:
+	elif plr.state == KOMA_A:
 		anim_L = "koma_a_L"
 		anim_R = "koma_a_R"
 		anim_U = "koma_U"
 		anim_D = "koma_a_D"
 		anim_act = "koma_close"
-	elif state == KOMA_UM:
+	elif plr.state == KOMA_UM:
 		anim_L = "koma_um_L"
 		anim_R = "koma_um_R"
 		anim_U = "koma_U"
 		anim_D = "koma_um_D"
 		anim_act = "koma_open"
-	elif state == SICK:
+	elif plr.state == SICK:
 		anim_L = "sick_L"
 		anim_R = "sick_R"
 		anim_U = "sick_U"
@@ -307,17 +303,14 @@ func debug():
 	
 	$StateDebug.text = "ACT:" + str(action)
 	$StunDebug.text = "STN:" + str(stun)
-	$EffectDebug.text = "EFC: " + str(state)
+	$EffectDebug.text = "EFC: " + str(plr.state)
 	$AnimDebug.text = $AnimatedSprite.get_animation() + str($AnimatedSprite.frame) + "/" + str(get_animation_frames(get_curr_player_animation()))
 	
-	$TimerDebug.show() if state == SICK else $TimerDebug.hide()
+	$TimerDebug.show() if plr.state == SICK else $TimerDebug.hide()
 	$TimerDebug.text = str($Run_Timer.get_time_left())
 
 func get_action():
 	return action
-
-func get_state():
-	return state
 
 func get_curr_player_animation():
 	return $AnimatedSprite.animation

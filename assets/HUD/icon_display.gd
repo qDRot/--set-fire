@@ -2,11 +2,9 @@ extends Control
 
 export (PackedScene) var Icon
 onready var scr = get_parent().get_node("imageArray_script")
-
-# TEMPORALY!!!
-var curr_eff = 1
+onready var plr = get_node("/root/PlayerStats")
 
 func _ready():
 	var icon = Icon.instance()
-	icon.frame = curr_eff
+	icon.frame = plr.state
 	add_child(icon)
