@@ -673,7 +673,7 @@ radius = 14.4384
 height = 7.87679
 
 [sub_resource type="RectangleShape2D" id=122]
-extents = Vector2( 10.7938, 3.5319 )
+extents = Vector2( 8.77728, 6.5319 )
 
 [node name="PlayerScene" type="Area2D"]
 

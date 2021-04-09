@@ -172,49 +172,47 @@ func effects():
 		elif Input.is_key_pressed(KEY_5):
 			reloadEffect(SICK)
 	
+	match state:
 	# Trash effect
-	if state == GOMI:
+		GOMI:	
+			# Stun on action
+			if Input.is_action_just_pressed("key_action"):
+				stun = false if stun else true
+				# Unstun in second action
+				# Play unhide animation
+				if !stun:
+					anim_act = "gomi_unhide"
+					$AnimatedSprite.animation = anim_act
+					$AnimatedSprite.play()
+					animation_tree()
 		
-		# Stun on action
-		if Input.is_action_just_pressed("key_action"):
-			stun = false if stun else true
-			# Unstun in second action
-			# Play unhide animation
-			if !stun:
-				anim_act = "gomi_unhide"
-				$AnimatedSprite.animation = anim_act
-				$AnimatedSprite.play()
-				animation_tree()
-	
 	# Knife effect
-	elif state == KNIFE:
-		# Spawn blood on drop_frame frame
-		# on blood_position point
-		# (relative to the player)
-		var blood = Blood.instance()
-		var drop_frame = 9
-		var blood_position = Vector2(-5, -8)
+		KNIFE:
+			# Spawn blood on drop_frame frame
+			# on blood_position point
+			# (relative to the player)
+			var blood = Blood.instance()
+			var drop_frame = 9
+			var blood_position = Vector2(-5, -8)
 		
-		if $AnimatedSprite.animation == anim_act && $AnimatedSprite.frame == drop_frame:
-			get_parent().get_parent().add_child(blood)
-			blood.global_position = global_position - blood_position
-			
-	
+			if $AnimatedSprite.animation == anim_act && $AnimatedSprite.frame == drop_frame:
+				get_parent().get_parent().add_child(blood)
+				blood.global_position = global_position - blood_position
+		
 	# Komainu effect
-	elif state == KOMA_UM || state == KOMA_A:
-		# Change UM and A state when pressed
-		# and vise versa
-		if Input.is_action_just_pressed("key_action"):
-			state = KOMA_UM if state == KOMA_A else KOMA_A
-			animation_tree()
-	
+		KOMA_UM, KOMA_A:
+			# Change UM and A state when pressed
+			# and vise versa
+			if Input.is_action_just_pressed("key_action"):
+				state = KOMA_UM if state == KOMA_A else KOMA_A
+				animation_tree()
 	# Sick effect
-	elif state == SICK:
-		# Speed up
-		speed = DEFAULT_SPEED + 100
-		# Timer on being tired
-		if action == NONE:
-			$Run_Timer.start()
+		SICK:
+			# Speed up
+			speed = DEFAULT_SPEED + 100
+			# Timer on being tired
+			if action == NONE:
+				$Run_Timer.start()
 	
 	# Broom effect
 	if state == CLEAN:

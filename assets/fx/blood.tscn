@@ -75,7 +75,7 @@ animations = [ {
 } ]
 
 [sub_resource type="CapsuleShape2D" id=14]
-radius = 3.70449
+radius = 2.07209
 height = 0.0
 
 [node name="blood" type="Area2D"]
