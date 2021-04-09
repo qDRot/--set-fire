@@ -1,18 +1,18 @@
 extends Sprite
 
+# TEMPORALY!!!!!
+var obtainedEffects = [0, 1, 3, 4]
+var curr_eff = 3
+
 func _ready():
-	
 	# Currect equipped effect
-	if frame == 1:
+	if frame == curr_eff:
 		modulate.a = 1
 	# Inactive effects
 	else:
-		modulate.r = 0.5
-		modulate.g = 0.22
-		modulate.b = 1
+		modulate.a = 0.5
 	
-	# Locked effects
-	if frame == 5:
+	if !obtainedEffects.has(frame):
 		frame = 0
 
 func get_dimensions():

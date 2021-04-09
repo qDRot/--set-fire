@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://assets/scenes/misc/eff_icons.gd" type="Script" id=1]
+[ext_resource path="res://assets/HUD/misc/eff_icons.gd" type="Script" id=1]
 [ext_resource path="res://assets/gfx/lables_sprite.png" type="Texture" id=2]
 
 [node name="Sprite" type="Sprite"]

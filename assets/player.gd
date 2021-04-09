@@ -15,7 +15,8 @@ enum {
 	KOMA_UM = 30
 }
 
-var obtainedEffects = [NORMAL, SICK, CLEAN]
+# TEMPORALLY!!!!!
+var obtainedEffects = [NORMAL, SICK, CLEAN, GOMI, KNIFE]
 
 # Player state
 enum {
