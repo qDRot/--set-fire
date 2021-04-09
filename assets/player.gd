@@ -15,6 +15,8 @@ enum {
 	KOMA_UM = 30
 }
 
+var obtainedEffects = [NORMAL, SICK, CLEAN]
+
 # Player state
 enum {
 	NONE,
@@ -56,7 +58,7 @@ func _ready():
 # Running every frame
 func _process(delta):
 	var velocity = input()
-	#debug()
+	debug()
 	effects()
 	
 	# Change position of node 
@@ -157,20 +159,13 @@ Effects
 # Effect-specific actions
 func effects():
 	
+	var numKey = [KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9]
+	
 	if action != ACT:
-		# Effect change on number keys
-		if Input.is_key_pressed(KEY_0):
-			reloadEffect(NONE)
-		elif Input.is_key_pressed(KEY_1):
-			reloadEffect(CLEAN)
-		elif Input.is_key_pressed(KEY_2):
-			reloadEffect(KNIFE)
-		elif Input.is_key_pressed(KEY_3):
-			reloadEffect(GOMI)
-		elif Input.is_key_pressed(KEY_4):
-			reloadEffect(KOMA_UM)
-		elif Input.is_key_pressed(KEY_5):
-			reloadEffect(SICK)
+		print(obtainedEffects.size())
+		for i in obtainedEffects.size():
+			if Input.is_key_pressed(numKey[i]):
+				reloadEffect(obtainedEffects[i])
 	
 	match state:
 	# Trash effect
