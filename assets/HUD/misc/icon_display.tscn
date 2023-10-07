@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://assets/HUD/misc/icon_display.gd" type="Script" id=1]
+[ext_resource path="res://assets/HUD/misc/eff_icons.tscn" type="PackedScene" id=2]
+
+
+[node name="icon_display" type="Control"]
+margin_right = 40.0
+margin_bottom = 40.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+Icon = ExtResource( 2 )

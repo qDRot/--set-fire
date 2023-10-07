@@ -1,9 +1,7 @@
-extends Area2D
+extends KinematicBody2D
 
 export (PackedScene) var Blood
 onready var plr = get_node("/root/PlayerStats")
-
-const DEFAULT_SPEED = 90
 
 # Effects
 enum {
@@ -16,18 +14,6 @@ enum {
 	KOMA_UM = 30
 }
 
-# Player plr.state
-enum {
-	NONE,
-	ACT,
-	WALK
-}
-
-# Default plr.states
-var action = NONE
-var stun = false
-export var speed:int = DEFAULT_SPEED
-
 # Screen size
 var screen_size
 
@@ -38,32 +24,26 @@ var timer_run = false
 # Collision
 onready var broomColis = get_node("Broom/Broom_Collision")
 
-# Animation variables
-var anim_U:String
-var anim_D:String
-var anim_R:String
-var anim_L:String
-var anim_act:String
-
 # When loading a node prepare animation tree
 # and get screen size
 func _ready():
-	plr.state = KNIFE
-	$AnimatedSprite.set_process_input(true)
-	animation_tree()
+	plr.animation_tree()
+	$AnimatedSprite.play()
 	screen_size = Vector2(ProjectSettings.get_setting("display/window/size/width"), ProjectSettings.get_setting("display/window/size/height"))
 
 # Running every frame
 func _process(delta):
 	var velocity = input()
-	debug()
+	#debug()
 	effects()
-	
-	# Change position of node 
-	position += velocity * delta
+
+	# If colliding change animation
+	if move_and_collide(velocity * delta):
+		stop_anim(1)
+	plr.position = position
 
 	# Restrict to screen size
-	restrict_to_screen()
+	#restrict_to_screen()
 	
 	animate(velocity)
 
@@ -77,27 +57,21 @@ func input():
 	var velocity = Vector2()
 
 	# Movement
-	if Input.is_action_pressed("ui_down"):
-		velocity.y += 1
-	if Input.is_action_pressed("ui_up"):
-		velocity.y -= 1
-	if Input.is_action_pressed("ui_right"):
-		velocity.x += 1
-	if Input.is_action_pressed("ui_left"):
-		velocity.x -= 1
-
+	var input_vector = Vector2.ZERO
+	input_vector.x = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
+	input_vector.y = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
+	velocity = input_vector.normalized()
+	
 	# Action
 	if Input.is_action_just_pressed("key_action"):
 		velocity = Vector2(0, 0)
-		action = ACT
-		$AnimatedSprite.animation = anim_act
+		plr.action = plr.ACT
+		$AnimatedSprite.animation = plr.anim_act
 		$AnimatedSprite.play()
-
-	if Input.is_action_just_pressed("ui_cancel"):
-		stunToggle()
+		
 
 	# Get velocity from input if not stunned
-	if !stun:
+	if !plr.stun:
 		pass
 	else:
 		velocity = Vector2(0, 0)
@@ -105,15 +79,16 @@ func input():
 	# Play animation when moving, stop on frame 1
 	# when standing, set current action
 	if velocity.length() > 0:
-		action = WALK
-		velocity = velocity.normalized() * speed
+		plr.action = plr.WALK
+		velocity = velocity.normalized() * plr.speed
 		$AnimatedSprite.play()
-	elif velocity.length() <= 0 && action != ACT:
-		action = NONE
-		$AnimatedSprite.frame = 1
-		$AnimatedSprite.stop()
+	elif velocity.length() <= 0 && plr.action != plr.ACT:
+		plr.action = plr.NONE
+		stop_anim(1)
 	
 	$VelocityDebug.text = str(velocity)
+	
+	plr.change_effect()
 	
 	return velocity
 
@@ -121,30 +96,35 @@ func input():
 func stun_for(time):
 	timer.set_wait_time(time)
 	timer.start()
-	stun = true
+	plr.stun = true
+
+# Stop animation on certain frame
+func stop_anim(frame):
+	$AnimatedSprite.frame = frame
+	$AnimatedSprite.stop()
 
 # Stun until the end of animation
 func stun_4anim(anim):
 	var num_frames = get_animation_frames(anim)
 	if $AnimatedSprite.frame < num_frames - 1:
-		stun = true
+		plr.stun = true
 	else:
-		stun = false
+		plr.stun = false
 
 # Toggle stun plr.state
 func stunToggle():
-	stun = false if stun else true
+	plr.stun = not plr.stun
 
 # Sets animations to actions
 func animate(velocity):
 	if velocity.x > 0:
-		$AnimatedSprite.animation = anim_R
+		$AnimatedSprite.animation = plr.anim_R
 	elif velocity.x < 0:
-		$AnimatedSprite.animation = anim_L
+		$AnimatedSprite.animation = plr.anim_L
 	elif velocity.y < 0:
-		$AnimatedSprite.animation = anim_U
+		$AnimatedSprite.animation = plr.anim_U
 	elif velocity.y > 0:
-		$AnimatedSprite.animation = anim_D
+		$AnimatedSprite.animation = plr.anim_D
 
 # Restricts player movement to screen
 func restrict_to_screen():
@@ -157,26 +137,19 @@ Effects
 # Effect-specific actions
 func effects():
 	
-	var numKey = [KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9]
-	
-	if action != ACT:
-		for i in plr.obtainedEffects.size():
-			if Input.is_key_pressed(numKey[i]):
-				reloadEffect(plr.obtainedEffects[i])
-	
 	match plr.state:
 	# Trash effect
 		GOMI:	
 			# Stun on action
 			if Input.is_action_just_pressed("key_action"):
-				stun = false if stun else true
+				stunToggle()
 				# Unstun in second action
 				# Play unhide animation
-				if !stun:
-					anim_act = "gomi_unhide"
-					$AnimatedSprite.animation = anim_act
+				if !plr.stun:
+					plr.anim_act = "gomi_unhide"
+					$AnimatedSprite.animation = plr.anim_act
 					$AnimatedSprite.play()
-					animation_tree()
+					plr.animation_tree()
 		
 	# Knife effect
 		KNIFE:
@@ -187,7 +160,7 @@ func effects():
 			var drop_frame = 9
 			var blood_position = Vector2(-5, -8)
 		
-			if $AnimatedSprite.animation == anim_act && $AnimatedSprite.frame == drop_frame:
+			if $AnimatedSprite.animation == plr.anim_act && $AnimatedSprite.frame == drop_frame:
 				get_parent().get_parent().add_child(blood)
 				blood.global_position = global_position - blood_position
 		
@@ -197,13 +170,13 @@ func effects():
 			# and vise versa
 			if Input.is_action_just_pressed("key_action"):
 				plr.state = KOMA_UM if plr.state == KOMA_A else KOMA_A
-				animation_tree()
+				plr.animation_tree()
 	# Sick effect
 		SICK:
 			# Speed up
-			speed = DEFAULT_SPEED + 100
+			plr.speed = plr.DEFAULT_SPEED + 100
 			# Timer on being tired
-			if action == NONE:
+			if plr.action == plr.NONE:
 				$Run_Timer.start()
 	
 	# Broom effect
@@ -214,16 +187,8 @@ func effects():
 		broomColis.disabled = true
 	
 	# Stun until action animation is finished
-	if $AnimatedSprite.animation == anim_act && plr.state != GOMI:
-		stun_4anim(anim_act)
-
-
-# Reload effect
-func reloadEffect(effect:int):
-	speed = DEFAULT_SPEED
-	plr.state = effect
-	animation_tree()
-
+	if $AnimatedSprite.animation == plr.anim_act && plr.state != GOMI:
+		stun_4anim(plr.anim_act)
 
 
 """
@@ -231,68 +196,17 @@ Timer control
 """
 # -> Default timer
 func _on_Timer_timeout():
-	stun = false
+	plr.stun = false
+
 # -> Run timer
 func _on_Run_Timer_timeout():
 	if plr.state == SICK:
-		stun = true
-		timer.set_wait_time(2)
-		timer.start()
+		plr.stun = true
+		stun_for(2)
 		$AnimatedSprite.animation = "sick_tired"
 		$AnimatedSprite.play()
-		action = ACT
+		plr.action = plr.ACT
 		$Run_Timer.stop()
-
-
-# Animation tree set
-func animation_tree():
-	# Normal
-	if plr.state == NORMAL:
-		anim_L = "norm_L"
-		anim_R = "norm_R"
-		anim_U = "norm_U"
-		anim_D = "norm_D"
-		anim_act = "default"
-	# Broom
-	elif plr.state == CLEAN:
-		anim_L = "clean_L"
-		anim_R = "clean_R"
-		anim_U = "clean_U"
-		anim_D = "clean_D"
-		anim_act = "clean_happy"
-	# Knife
-	elif plr.state == KNIFE:
-		anim_L = "knife_L"
-		anim_R = "knife_R"
-		anim_U = "knife_U"
-		anim_D = "knife_D"
-		anim_act = "knife_cut"
-	# Trash
-	elif plr.state == GOMI:
-		anim_L = "gomi_L"
-		anim_R = "gomi_R"
-		anim_U = "gomi_U"
-		anim_D = "gomi_D"
-		anim_act = "gomi_hide"
-	# Komainu
-	elif plr.state == KOMA_A:
-		anim_L = "koma_a_L"
-		anim_R = "koma_a_R"
-		anim_U = "koma_U"
-		anim_D = "koma_a_D"
-		anim_act = "koma_close"
-	elif plr.state == KOMA_UM:
-		anim_L = "koma_um_L"
-		anim_R = "koma_um_R"
-		anim_U = "koma_U"
-		anim_D = "koma_um_D"
-		anim_act = "koma_open"
-	elif plr.state == SICK:
-		anim_L = "sick_L"
-		anim_R = "sick_R"
-		anim_U = "sick_U"
-		anim_D = "sick_D"
-		anim_act = "sick_act"
 
 func debug():
 	$StateDebug.show()
@@ -301,16 +215,16 @@ func debug():
 	$AnimDebug.show()
 	$VelocityDebug.show()
 	
-	$StateDebug.text = "ACT:" + str(action)
-	$StunDebug.text = "STN:" + str(stun)
+	$StateDebug.text = "ACT:" + str(plr.action)
+	$StunDebug.text = "STN:" + str(plr.stun)
 	$EffectDebug.text = "EFC: " + str(plr.state)
 	$AnimDebug.text = $AnimatedSprite.get_animation() + str($AnimatedSprite.frame) + "/" + str(get_animation_frames(get_curr_player_animation()))
 	
 	$TimerDebug.show() if plr.state == SICK else $TimerDebug.hide()
-	$TimerDebug.text = str($Run_Timer.get_time_left())
+	$TimerDebug.text = str($Timer.get_time_left())
 
 func get_action():
-	return action
+	return plr.action
 
 func get_curr_player_animation():
 	return $AnimatedSprite.animation

@@ -8,7 +8,7 @@ func _ready():
 		modulate.a = 1
 	# Inactive effects
 	else:
-		modulate.a = 0.5
+		modulate = Color(1, 0, 0)
 	
 	if !plr.obtainedEffects.has(frame):
 		frame = 0

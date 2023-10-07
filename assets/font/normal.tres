@@ -1,0 +1,18 @@
+[gd_resource type="DynamicFont" load_steps=3 format=2]
+
+[ext_resource path="res://assets/font/sazanami-gothic.ttf" type="DynamicFontData" id=1]
+
+[sub_resource type="DynamicFontData" id=1]
+antialiased = false
+hinting = 0
+font_path = "res://assets/font/m5x7.ttf"
+
+[resource]
+size = 15
+outline_size = 1
+outline_color = Color( 0, 0, 0, 1 )
+extra_spacing_top = -4
+extra_spacing_bottom = -3
+extra_spacing_char = 1
+font_data = SubResource( 1 )
+fallback/0 = ExtResource( 1 )

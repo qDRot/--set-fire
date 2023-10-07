@@ -1,0 +1,115 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/HUD/console.gd" type="Script" id=1]
+[ext_resource path="res://assets/HUD/console_commands.gd" type="Script" id=2]
+[ext_resource path="res://assets/HUD/theme.tres" type="Theme" id=3]
+
+[node name="Console" type="Control"]
+pause_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="commands" type="Control" parent="."]
+margin_right = 58.0
+margin_bottom = 40.0
+rect_scale = Vector2( 0.98653, 0.991996 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="vertical" type="VBoxContainer" parent="."]
+margin_left = 90.0
+margin_top = 4.0
+margin_right = 308.0
+margin_bottom = 175.0
+grow_horizontal = 2
+alignment = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="vertical"]
+margin_right = 218.0
+margin_bottom = 142.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 7
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="text" type="TextEdit" parent="vertical/HBoxContainer"]
+margin_right = 129.0
+margin_bottom = 142.0
+focus_mode = 0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.03
+theme = ExtResource( 3 )
+text = "d
+a
+Hello
+help
+
+hell
+:w is a save command
+a
+a
+a
+a
+
+a
+a
+a
+a
+a
+a
+a
+a"
+readonly = true
+syntax_highlighting = true
+breakpoint_gutter = true
+wrap_enabled = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="out" type="TextEdit" parent="vertical/HBoxContainer"]
+margin_left = 136.0
+margin_right = 218.0
+margin_bottom = 142.0
+focus_mode = 0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.29
+theme = ExtResource( 3 )
+text = "[INIT]"
+readonly = true
+highlight_current_line = true
+show_line_numbers = true
+breakpoint_gutter = true
+wrap_enabled = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="in" type="LineEdit" parent="vertical"]
+margin_top = 146.0
+margin_right = 218.0
+margin_bottom = 171.0
+mouse_filter = 2
+mouse_default_cursor_shape = 3
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.0
+theme = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="exitted" from="." to="." method="_on_Console_exitted"]
+[connection signal="text_entered" from="vertical/in" to="." method="_on_in_text_entered"]

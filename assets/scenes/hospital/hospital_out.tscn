@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/gfx/scenes/hospital/hospital_out.tres" type="TileSet" id=1]
+[ext_resource path="res://assets/player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://assets/scenes/general_scripts/camera_follow_player.gd" type="Script" id=3]
+
+[node name="HospitalOut" type="Node2D"]
+
+[node name="bg" type="TileMap" parent="."]
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 20, 20 )
+format = 1
+tile_data = PoolIntArray( -786410, 10, 0, -655338, 16, 0, 458744, 11, 0, 524286, 9, 0, 458752, 9, 0, 458757, 9, 0, 458759, 9, 0, 458764, 9, 0, 655350, 12, 0, 786420, 12, 0 )
+
+[node name="PlayerScene" parent="." instance=ExtResource( 2 )]
+position = Vector2( 456.216, 85.5949 )
+
+[node name="CameraToPlayer" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+script = ExtResource( 3 )
+
+[node name="fg" type="TileMap" parent="."]
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 20, 20 )
+format = 1
+tile_data = PoolIntArray( -458735, 15, 1, -458733, 15, 1, -458731, 15, 1, -458729, 15, 1, -458727, 15, 1, -458726, 13, 0, -327663, 15, 0, -327661, 15, 0, -327659, 15, 0, -327657, 15, 0, -327655, 15, 0, -196591, 15, 0, -196589, 15, 0, -196587, 15, 0, -196585, 15, 0, -196583, 15, 0, -65519, 15, 0, -65517, 15, 0, -65515, 15, 0, -65513, 15, 0, -65511, 15, 0, -65509, 15, 0, 65538, 1, 0, 65545, 1, 0, 65553, 15, 0, 65555, 15, 0, 65557, 15, 0, 65559, 15, 0, 65561, 15, 0, 65563, 15, 0, 196625, 15, 0, 196627, 15, 0, 196629, 15, 0, 196631, 15, 0, 196633, 15, 0, 196635, 15, 0, 262171, 14, 0, 327695, 6, 0, 327697, 15, 0, 327699, 15, 0, 327701, 15, 0, 327703, 15, 0, 327705, 15, 0, 327707, 15, 0, 458769, 15, 1, 458771, 15, 1, 458773, 15, 1, 458775, 15, 1, 458777, 15, 1, 458779, 15, 1 )
+
+[node name="windows" type="TileMap" parent="."]
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 20, 20 )
+format = 1
+tile_data = PoolIntArray( -393198, 7, 0, -393192, 7, 0, -65517, 5, 0, 262162, 7, 0, 262168, 7, 0 )
